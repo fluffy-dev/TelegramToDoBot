@@ -46,21 +46,15 @@ async def on_save_categories(callback: CallbackQuery, button: Button, manager: D
     selected_ids = manager.find("category_multiselect_edit").get_checked()
 
     try:
-        current_task = await api_client.get_task(task_id)
-        payload = {
-            "title": current_task['title'],
-            "description": current_task['description'],
-            "due_date": current_task['due_date'],
-            "is_completed": current_task['is_completed'],
-            "categories": selected_ids
-        }
-        await api_client.update_task(task_id, payload)
+        # Формируем payload только с теми данными, что меняем
+        payload = {"categories": selected_ids}
+        # Вызываем patch_task
+        await api_client.patch_task(task_id, payload)
         await callback.answer("Categories updated!", show_alert=True)
     except Exception as e:
         await callback.answer(f"Failed to update categories: {e}", show_alert=True)
 
     await manager.done()
-
 
 edit_task_dialog = Dialog(
     Window(

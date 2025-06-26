@@ -134,6 +134,7 @@ async def cmd_new_task(message: Message, dialog_manager: DialogManager):
     """Handler for starting the task creation dialog."""
     await dialog_manager.start(CreateTask.title, mode=StartMode.RESET_STACK)
 
+
 @router.callback_query(F.data.startswith("task_complete:"))
 async def handle_task_complete(callback: CallbackQuery):
     """Handles the 'Mark as Done' button press."""
@@ -147,10 +148,15 @@ async def handle_task_complete(callback: CallbackQuery):
 
     api_client = ApiClient(base_url=API_BASE_URL, token=token)
     try:
-        await api_client.update_task(task_id, {"is_completed": True})
+        # Формируем payload только с теми данными, что меняем
+        payload = {"is_completed": True}
+        # Вызываем новый метод patch_task
+        await api_client.patch_task(task_id, payload)
+
+        # Обновляем текст сообщения, убираем кнопки
         await callback.message.edit_text(
             text=callback.message.text.replace("❌", "✅ Done!"),
-            reply_markup=None # Убираем клавиатуру после нажатия
+            reply_markup=None
         )
         await callback.answer("Task marked as completed!")
     except Exception as e:

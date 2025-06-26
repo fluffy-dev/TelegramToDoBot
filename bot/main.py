@@ -32,13 +32,10 @@ async def main():
     setup_dialogs(dp)
 
     await bot.delete_webhook(drop_pending_updates=True)
+    dp.include_router(edit_task_dialog)
     await dp.start_polling(bot)
 
     asyncio.create_task(start_webhook_server(bot))
-
-    await bot.delete_webhook(drop_pending_updates=True)
-    dp.include_router(edit_task_dialog)
-    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":

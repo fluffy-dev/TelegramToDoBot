@@ -49,24 +49,20 @@ class TaskApi(APIView):
     class InputSerializer(serializers.Serializer):
         """Serializer for creating/updating a task."""
         title = serializers.CharField(max_length=255)
-        description = serializers.CharField(required=False, allow_blank=True)
-        due_date = serializers.DateTimeField()
+        description = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+        # Указываем форматы, которые мы принимаем.
+        # '%Y-%m-%dT%H:%M:%S.%fZ' - формат с миллисекундами, который отдает DRF
+        # '%Y-%m-%dT%H:%M:%SZ' - формат без миллисекунд
+        # '%Y-%m-%d %H:%M' - формат для ввода из диалога бота
+        due_date = serializers.DateTimeField(
+            input_formats=['%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%d %H:%M']
+        )
         is_completed = serializers.BooleanField(required=False)
         categories = serializers.PrimaryKeyRelatedField(
             queryset=Category.objects.all(),
             many=True,
             required=False
         )
-
-        def validate_categories(self, value):
-            """Check that categories belong to the user."""
-            user = self.context['request'].user
-            for category in value:
-                if category.user != user:
-                    raise serializers.ValidationError(
-                        f"Category '{category.name}' does not belong to you."
-                    )
-            return value
 
     class OutputSerializer(serializers.ModelSerializer):
         """Serializer for displaying a task."""
@@ -135,3 +131,15 @@ class TaskDetailApi(APIView):
         task = self.get_task(request.user, task_id)
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, task_id: str):
+        """Partially update a single task."""
+        task = self.get_task(request.user, task_id)
+        # partial=True говорит сериализатору, что мы обновляем только часть полей
+        serializer = TaskApi.InputSerializer(
+            instance=task, data=request.data, partial=True, context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        updated_task = services.task_update(task=task, data=serializer.validated_data)
+        data = TaskApi.OutputSerializer(updated_task).data
+        return Response(data)
