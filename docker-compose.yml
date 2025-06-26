@@ -16,8 +16,6 @@ services:
   backend:
     build: .
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
-    volumes:
-      - ./src:/app
     ports:
       - "8000:8000"
     environment:
@@ -27,6 +25,8 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
       - DJANGO_TIME_ZONE=${DJANGO_TIME_ZONE}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     depends_on:
       - db
       - redis
@@ -34,8 +34,6 @@ services:
   celery_worker:
     build: .
     command: celery -A core worker -l INFO
-    volumes:
-      - ./src:/app
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=${DJANGO_DEBUG}
@@ -43,14 +41,14 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
       - DJANGO_TIME_ZONE=${DJANGO_TIME_ZONE}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     depends_on:
       - backend
 
   celery_beat:
     build: .
     command: celery -A core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    volumes:
-      - ./src:/app
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=${DJANGO_DEBUG}
@@ -58,6 +56,8 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
       - DJANGO_TIME_ZONE=${DJANGO_TIME_ZONE}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     depends_on:
       - backend
 
