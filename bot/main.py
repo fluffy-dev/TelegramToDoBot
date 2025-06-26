@@ -3,6 +3,7 @@ import logging
 import sys
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties # <-- Импортируем новый класс
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
@@ -16,7 +17,12 @@ async def main():
         logging.error("BOT_TOKEN environment variable is not set.")
         sys.exit(1)
 
-    bot = Bot(token=BOT_TOKEN, parse_mode=ParseMode.HTML)
+    # Создаем объект с настройками по умолчанию
+    default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+
+    # Передаем его в конструктор Bot через аргумент `default`
+    bot = Bot(token=BOT_TOKEN, default=default_properties)
+
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
 
