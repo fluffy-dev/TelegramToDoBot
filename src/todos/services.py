@@ -6,6 +6,7 @@ from typing import Optional
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from common.services import model_update
 from todos.models import Category, Task
@@ -113,5 +114,25 @@ def task_update(*, task: Task, data: dict) -> Task:
 
     if 'categories' in data:
         task.categories.set(data['categories'])
+
+    return task
+
+@transaction.atomic
+def task_set_notification_sent(*, task: Task) -> Task:
+    """
+    Marks a task's notification as sent to prevent re-sending.
+
+    Args:
+        task (Task): The task instance to update.
+
+    Returns:
+        Task: The updated task instance.
+    """
+    if task.notification_sent:
+        raise ValidationError("Notification has already been sent for this task.")
+
+    task.notification_sent = True
+    task.full_clean(exclude=['user', 'categories'])
+    task.save(update_fields=['notification_sent'])
 
     return task
