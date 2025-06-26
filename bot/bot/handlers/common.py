@@ -5,9 +5,13 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
+from aiogram_dialog import DialogManager, StartMode
 
+from bot.dialogs.states import CreateTask
 from bot.api_client import ApiClient
 from bot.config import API_BASE_URL, REDIS_URL
+
+
 
 router = Router()
 redis_client = redis.from_url(REDIS_URL, decode_responses=True)
@@ -98,3 +102,8 @@ async def cmd_tasks(message: Message):
     except Exception as e:
         logger.error(f"Failed to fetch tasks for user {user_id}: {e}")
         await message.answer("Failed to fetch tasks. Please try again later.")
+
+@router.message(F.text == "/newtask")
+async def cmd_new_task(message: Message, dialog_manager: DialogManager):
+    """Handler for starting the task creation dialog."""
+    await dialog_manager.start(CreateTask.title, mode=StartMode.RESET_STACK)
