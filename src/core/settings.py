@@ -30,8 +30,8 @@ INSTALLED_APPS = [
     'django_filters',
 
     # Local apps
-    'common.apps.CommonConfig',
-    'todos.apps.TodosConfig',
+    'common',
+    'todos',
 ]
 
 MIDDLEWARE = [
