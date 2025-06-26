@@ -101,11 +101,10 @@ create_task_dialog = Dialog(
             item_id_getter=operator.itemgetter(1),
             items="categories",
         ),
-        getter=get_categories_data,
-        state=CreateTask.categories,
-        # Кнопка "Далее" для пропуска, если не выбрано ни одной категории
         Next(Const("Next >>")),
         Back(Const("<< Back")),
+        getter=get_categories_data,
+        state=CreateTask.categories,
     ),
     Window(
         Const("Finally, enter the due date in YYYY-MM-DD HH:MM format:"),
