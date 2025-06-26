@@ -60,6 +60,17 @@ services:
       - POSTGRES_PORT=5432
     depends_on:
       - backend
+  bot:
+    build:
+      context: .
+      dockerfile: bot/Dockerfile
+    command: python main.py
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - API_BASE_URL=http://backend:8000/api/v1
+      - REDIS_URL_FOR_BOT=redis://redis:6379/1
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
