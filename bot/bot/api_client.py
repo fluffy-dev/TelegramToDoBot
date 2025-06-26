@@ -66,3 +66,24 @@ class ApiClient:
     async def get_categories(self) -> list:
         """Fetches the list of categories."""
         return await self._request("GET", "/categories/")
+
+    async def create_task(self, title: str, description: str, due_date: str, category_ids: list[str]) -> dict:
+        """
+        Creates a new task.
+
+        Args:
+            title: The title of the task.
+            description: The description of the task.
+            due_date: The due date in ISO format.
+            category_ids: A list of category IDs to associate with the task.
+
+        Returns:
+            The created task data.
+        """
+        payload = {
+            "title": title,
+            "description": description,
+            "due_date": due_date,
+            "categories": category_ids
+        }
+        return await self._request("POST", "/tasks/", json=payload)
