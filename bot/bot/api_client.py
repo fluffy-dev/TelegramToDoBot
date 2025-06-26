@@ -87,3 +87,24 @@ class ApiClient:
             "categories": category_ids
         }
         return await self._request("POST", "/tasks/", json=payload)
+
+    async def get_task(self, task_id: str) -> dict:
+        """Fetches a single task by its ID."""
+        return await self._request("GET", f"/tasks/{task_id}/")
+
+    async def delete_task(self, task_id: str) -> None:
+        """Deletes a task by its ID."""
+        await self._request("DELETE", f"/tasks/{task_id}/")
+
+    async def update_task(self, task_id: str, payload: dict) -> dict:
+        """
+        Updates an existing task.
+
+        Args:
+            task_id: The ID of the task to update.
+            payload: A dictionary with the data to update.
+
+        Returns:
+            The updated task data.
+        """
+        return await self._request("PUT", f"/tasks/{task_id}/", json=payload)

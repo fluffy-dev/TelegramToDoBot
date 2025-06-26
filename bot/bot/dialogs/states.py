@@ -9,3 +9,8 @@ class CreateTask(StatesGroup):
     description = State()
     categories = State()
     due_date = State()
+
+class EditTask(StatesGroup):
+    """States for the task editing dialog."""
+    choose_action = State()
+    edit_categories = State()

@@ -14,18 +14,19 @@ from todos.models import Category, Task
 
 def _generate_hash_id(*, user_id: int, identifier: str) -> str:
     """
-    Generates a SHA-256 hash to be used as a primary key.
+    Generates a SHA-1 hash to be used as a primary key.
 
     Args:
         user_id (int): The ID of the user creating the object.
         identifier (str): A unique string for the object (e.g., title).
 
     Returns:
-        str: A 64-character hexadecimal string.
+        str: A 40-character hexadecimal string.
     """
     now_iso = timezone.now().isoformat()
     creation_string = f"{user_id}:{identifier}:{now_iso}"
-    return hashlib.sha256(creation_string.encode('utf-8')).hexdigest()
+    # Меняем sha256 на sha1
+    return hashlib.sha1(creation_string.encode('utf-8')).hexdigest()
 
 
 @transaction.atomic

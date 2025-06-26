@@ -119,3 +119,6 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
+
+BOT_WEBHOOK_URL = env('BOT_WEBHOOK_URL', default='http://bot:8080/notify')

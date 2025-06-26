@@ -15,7 +15,7 @@ class Category(BaseModel):
     """
     id = models.CharField(
         primary_key=True,
-        max_length=64,
+        max_length=40,
         editable=False,
     )
     name = models.CharField(max_length=100)
@@ -51,7 +51,7 @@ class Task(BaseModel):
     """
     id = models.CharField(
         primary_key=True,
-        max_length=64,
+        max_length=40,
         editable=False,
     )
     title = models.CharField(max_length=255)

@@ -6,11 +6,13 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram_dialog import setup_dialogs # <-- Импорт
+from aiogram_dialog import setup_dialogs
 
 from bot.config import BOT_TOKEN
 from bot.handlers import common
-from bot.dialogs.task_creation import create_task_dialog # <-- Импорт
+from bot.dialogs.task_creation import create_task_dialog
+from bot.webhook_server import start_webhook_server
+from bot.dialogs.task_editing import edit_task_dialog
 
 
 async def main():
@@ -30,6 +32,12 @@ async def main():
     setup_dialogs(dp)
 
     await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+    asyncio.create_task(start_webhook_server(bot))
+
+    await bot.delete_webhook(drop_pending_updates=True)
+    dp.include_router(edit_task_dialog)
     await dp.start_polling(bot)
 
 
